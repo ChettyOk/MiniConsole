@@ -26,7 +26,7 @@ On macOS with Homebrew you typically run `brew install sfml` and, if CMake canno
 ### WebAssembly build (Emscripten)
 
 1. Install and activate Emscripten SDK.
-2. Build SFML for Emscripten and export `SFML_DIR` to its CMake package path.
+2. Build **VRSFML** (web-capable SFML fork) for Emscripten and export `SFML_DIR` to its CMake package path.
 3. Run:
 
 ```bash
@@ -34,6 +34,8 @@ On macOS with Homebrew you typically run `brew install sfml` and, if CMake canno
 ```
 
 The output is generated in `build-web/` (`miniconsole.html`, `.js`, `.wasm`, `.data`).
+
+> Note: Upstream SFML 3.0.2 does not currently configure on Emscripten. The web pipeline uses VRSFML in CI.
 
 ### Troubleshooting
 
@@ -61,7 +63,7 @@ This repository includes `.github/workflows/deploy-web.yml` to build and publish
 
 Workflow behavior:
 
-- Builds SFML 3.0.2 for Emscripten in CI (cached)
+- Builds VRSFML for Emscripten in CI (cached)
 - Builds this project via `emcmake`
 - Publishes `miniconsole` web artifacts to Pages on `main` pushes (or manual trigger)
 

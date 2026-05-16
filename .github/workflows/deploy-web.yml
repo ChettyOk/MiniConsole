@@ -30,12 +30,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: sfml-install
-          key: sfml-web-3.0.2-${{ runner.os }}
+          key: vrsfml-web-main-${{ runner.os }}
 
-      - name: Build SFML for Emscripten
+      - name: Build VRSFML for Emscripten
         if: ${{ !hashFiles('sfml-install/lib/cmake/SFML/SFMLConfig.cmake') }}
         run: |
-          git clone --depth 1 --branch 3.0.2 https://github.com/SFML/SFML.git sfml-src
+          git clone --depth 1 https://github.com/vittorioromeo/VRSFML.git sfml-src
           emcmake cmake -S sfml-src -B sfml-build \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/sfml-install" \

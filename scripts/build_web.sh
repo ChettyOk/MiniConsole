@@ -12,7 +12,7 @@ fi
 
 if [[ -z "${SFML_DIR:-}" ]]; then
   echo "error: SFML_DIR is not set."
-  echo "       Build SFML for Emscripten and export SFML_DIR to its cmake package path."
+  echo "       Build VRSFML for Emscripten and export SFML_DIR to its cmake package path."
   echo "       Example: export SFML_DIR=\$PWD/sfml-install/lib/cmake/SFML"
   exit 1
 fi
