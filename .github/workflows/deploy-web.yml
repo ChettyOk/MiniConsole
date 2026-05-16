@@ -32,7 +32,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: sfml-install
-          key: vrsfml-web-main-v6-${{ runner.os }}    # v6: force clean after Emscripten upgrade
+          key: vrsfml-web-main-v7-${{ runner.os }}    # v6: force clean after Emscripten upgrade
 
       - name: Build VRSFML for Emscripten
         if: steps.cache-sfml.outputs.cache-hit != 'true'   # skip when cache restored
@@ -46,7 +46,8 @@ jobs:
             -DSFML_BUILD_AUDIO=OFF \
             -DSFML_BUILD_NETWORK=OFF \
             -DSFML_BUILD_EXAMPLES=OFF \
-            -DSFML_BUILD_TEST_SUITE=OFF
+            -DSFML_BUILD_TEST_SUITE=OFF \
+            -DSFML_BUILD_GLUTILS=ON
           cmake --build sfml-build --target install -j 4
 
       - name: Configure MiniConsole web build
