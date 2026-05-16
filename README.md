@@ -35,7 +35,7 @@ On macOS with Homebrew you typically run `brew install sfml` and, if CMake canno
 
 The output is generated in `build-web/` (`miniconsole.html`, `.js`, `.wasm`, `.data`).
 
-> Note: Upstream SFML 3.0.2 does not currently configure on Emscripten. The web pipeline uses VRSFML in CI.
+> Note: Upstream SFML 3.0.2 does not currently configure on Emscripten. The web pipeline uses VRSFML (with submodules and bundled deps) in CI.
 
 ### Troubleshooting
 
