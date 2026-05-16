@@ -30,7 +30,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: sfml-install
-          key: vrsfml-web-main-v2-${{ runner.os }}
+          key: vrsfml-web-main-v3-${{ runner.os }}
 
       - name: Build VRSFML for Emscripten
         if: ${{ !hashFiles('sfml-install/lib/cmake/SFML/SFMLConfig.cmake') }}

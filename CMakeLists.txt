@@ -36,6 +36,33 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if(EMSCRIPTEN)
     set(SFML_STATIC_LIBRARIES ON)
+
+    # VRSFML's current package export for web builds may reference helper targets
+    # that are not exported in SFMLConfig. Define compatibility imported targets
+    # from installed archives when available so find_package succeeds in CI.
+    if(DEFINED SFML_DIR)
+        get_filename_component(_sfml_prefix "${SFML_DIR}/../../.." ABSOLUTE)
+
+        if(NOT TARGET freetype)
+            file(GLOB _freetype_archives "${_sfml_prefix}/lib/*freetype*.a")
+            list(LENGTH _freetype_archives _ft_count)
+            if(_ft_count GREATER 0)
+                list(GET _freetype_archives 0 _ft_archive)
+                add_library(freetype STATIC IMPORTED GLOBAL)
+                set_target_properties(freetype PROPERTIES IMPORTED_LOCATION "${_ft_archive}")
+            endif()
+        endif()
+
+        if(NOT TARGET SFML::GLUtils)
+            file(GLOB _glutils_archives "${_sfml_prefix}/lib/*glutils*.a")
+            list(LENGTH _glutils_archives _glu_count)
+            if(_glu_count GREATER 0)
+                list(GET _glutils_archives 0 _glu_archive)
+                add_library(SFML::GLUtils STATIC IMPORTED GLOBAL)
+                set_target_properties(SFML::GLUtils PROPERTIES IMPORTED_LOCATION "${_glu_archive}")
+            endif()
+        endif()
+    endif()
 endif()
 
 find_package(SFML 3 COMPONENTS Graphics Window System REQUIRED)
