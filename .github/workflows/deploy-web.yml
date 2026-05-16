@@ -24,16 +24,17 @@ jobs:
       - name: Setup Emscripten
         uses: mymindstorm/setup-emsdk@v14
         with:
-          version: latest
+          version: "3.1.37"          # pinned — change only after testing locally
 
       - name: Cache SFML install
+        id: cache-sfml               # id required so next step can read cache-hit
         uses: actions/cache@v4
         with:
           path: sfml-install
           key: vrsfml-web-main-v3-${{ runner.os }}
 
       - name: Build VRSFML for Emscripten
-        if: ${{ !hashFiles('sfml-install/lib/cmake/SFML/SFMLConfig.cmake') }}
+        if: steps.cache-sfml.outputs.cache-hit != 'true'   # skip when cache restored
         run: |
           git clone --depth 1 --recurse-submodules https://github.com/vittorioromeo/VRSFML.git sfml-src
           emcmake cmake -S sfml-src -B sfml-build \
@@ -60,10 +61,18 @@ jobs:
       - name: Assemble static site
         run: |
           mkdir -p site
+
+          # Suppress Jekyll processing — prevents Pages stripping _ prefixed files
+          touch site/.nojekyll
+
           cp build-web/miniconsole.html site/index.html
-          cp build-web/miniconsole.js site/
+          cp build-web/miniconsole.js   site/
           cp build-web/miniconsole.wasm site/
-          cp build-web/miniconsole.data site/
+
+          # .data only exists when assets are preloaded via --preload-file
+          if [ -f build-web/miniconsole.data ]; then
+            cp build-web/miniconsole.data site/
+          fi
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3
@@ -73,6 +82,9 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    permissions:                     # explicit on the job that writes to Pages
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
