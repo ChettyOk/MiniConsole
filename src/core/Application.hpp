@@ -5,6 +5,7 @@
 #include "core/GameState.hpp"
 #include "core/HighScoreBoard.hpp"
 
+#include <SFML/System/Clock.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <memory>
 #include <optional>
@@ -30,9 +31,11 @@ public:
 
 private:
     void applyPendingState();
+    bool runFrame();
 
     sf::RenderWindow window_;
     GameClock fixedClock_;
+    sf::Clock frameClock_;
     std::unique_ptr<GameState> state_;
     std::optional<std::unique_ptr<GameState>> pending_;
     HighScoreBoard scores_;

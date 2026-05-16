@@ -1,0 +1,80 @@
+name: Deploy Web Build
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: latest
+
+      - name: Cache SFML install
+        uses: actions/cache@v4
+        with:
+          path: sfml-install
+          key: sfml-web-3.0.2-${{ runner.os }}
+
+      - name: Build SFML for Emscripten
+        if: ${{ !hashFiles('sfml-install/lib/cmake/SFML/SFMLConfig.cmake') }}
+        run: |
+          git clone --depth 1 --branch 3.0.2 https://github.com/SFML/SFML.git sfml-src
+          emcmake cmake -S sfml-src -B sfml-build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/sfml-install" \
+            -DBUILD_SHARED_LIBS=OFF \
+            -DSFML_BUILD_AUDIO=OFF \
+            -DSFML_BUILD_NETWORK=OFF \
+            -DSFML_BUILD_EXAMPLES=OFF \
+            -DSFML_BUILD_TEST_SUITE=OFF
+          cmake --build sfml-build --target install -j 4
+
+      - name: Configure MiniConsole web build
+        run: |
+          emcmake cmake -S . -B build-web \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DSFML_DIR="$GITHUB_WORKSPACE/sfml-install/lib/cmake/SFML"
+
+      - name: Build MiniConsole web artifacts
+        run: cmake --build build-web -j 4
+
+      - name: Assemble static site
+        run: |
+          mkdir -p site
+          cp build-web/miniconsole.html site/index.html
+          cp build-web/miniconsole.js site/
+          cp build-web/miniconsole.wasm site/
+          cp build-web/miniconsole.data site/
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

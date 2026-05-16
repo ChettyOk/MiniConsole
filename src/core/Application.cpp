@@ -6,6 +6,10 @@
 #include <SFML/System/Sleep.hpp>
 #include <SFML/Window/Event.hpp>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten/emscripten.h>
+#endif
+
 #include <optional>
 
 namespace mc {
@@ -41,48 +45,67 @@ void Application::applyPendingState() {
     }
 }
 
-void Application::run() {
-    sf::Clock frameClock;
-    while (running_ && window_.isOpen()) {
-        while (const std::optional<sf::Event> event = window_.pollEvent()) {
-            if (event->is<sf::Event::Closed>()) {
-                running_ = false;
-            }
-            if (state_) {
-                state_->handleInput(*event);
-            }
+bool Application::runFrame() {
+    while (const std::optional<sf::Event> event = window_.pollEvent()) {
+        if (event->is<sf::Event::Closed>()) {
+            running_ = false;
         }
-
-        applyPendingState();
-        if (!state_) {
-            break;
-        }
-
-        const sf::Time realDelta = frameClock.restart();
-        const int steps = fixedClock_.consumeRealDelta(realDelta);
-        const sf::Time step = fixedClock_.fixedStep();
-        for (int i = 0; i < steps; ++i) {
-            state_->update(step);
-            applyPendingState();
-            if (!state_) {
-                break;
-            }
-        }
-
-        if (!running_ || !state_) {
-            break;
-        }
-
-        window_.clear(sf::Color(18, 18, 24));
-        state_->render(window_);
-        window_.display();
-
-        // Gentle throttle if vsync is off on some drivers.
-        const sf::Time frameTime = frameClock.getElapsedTime();
-        if (frameTime < sf::milliseconds(1)) {
-            sf::sleep(sf::milliseconds(1) - frameTime);
+        if (state_) {
+            state_->handleInput(*event);
         }
     }
+
+    applyPendingState();
+    if (!state_) {
+        return false;
+    }
+
+    const sf::Time realDelta = frameClock_.restart();
+    const int steps = fixedClock_.consumeRealDelta(realDelta);
+    const sf::Time step = fixedClock_.fixedStep();
+    for (int i = 0; i < steps; ++i) {
+        state_->update(step);
+        applyPendingState();
+        if (!state_) {
+            return false;
+        }
+    }
+
+    if (!running_ || !state_) {
+        return false;
+    }
+
+    window_.clear(sf::Color(18, 18, 24));
+    state_->render(window_);
+    window_.display();
+
+    // Gentle throttle if vsync is off on some drivers.
+#ifndef __EMSCRIPTEN__
+    const sf::Time frameTime = frameClock_.getElapsedTime();
+    if (frameTime < sf::milliseconds(1)) {
+        sf::sleep(sf::milliseconds(1) - frameTime);
+    }
+#endif
+    return running_ && window_.isOpen();
+}
+
+void Application::run() {
+#ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop_arg(
+        [](void* userData) {
+            auto* app = static_cast<Application*>(userData);
+            if (!app->runFrame()) {
+                emscripten_cancel_main_loop();
+            }
+        },
+        this, 0, true);
+#else
+    while (running_ && window_.isOpen()) {
+        if (!runFrame()) {
+            break;
+        }
+    }
+#endif
 }
 
 } // namespace mc

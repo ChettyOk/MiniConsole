@@ -1,6 +1,9 @@
 # MiniConsole
 
-A small C++ “game console” host built with **SFML 3**: one window, a menu, and multiple 2D games. Playable games now include **Breakout**, **Top-down shooter**, **Platformer**, and **Tower defense**. Persistent **top-5 highscores** are tracked across runs and viewable from a dedicated menu option.
+[![Deploy Web Build](https://github.com/ChettyOk/MiniConsole/actions/workflows/deploy-web.yml/badge.svg?branch=main)](https://github.com/ChettyOk/MiniConsole/actions/workflows/deploy-web.yml)
+[Play in Browser (GitHub Pages)](https://chettyok.github.io/MiniConsole/)
+
+A small C++ “game console” host built with **SFML 3**: one window, a menu, and multiple 2D games. Playable games include **Breakout**, **Top-down shooter**, **Platformer**, **Tower defense**, **Minesweeper**, and **Pac-Man**. Persistent **top-5 highscores** are tracked across runs and viewable from a dedicated menu option.
 
 The menu includes a **Difficulty** selector (**Normal/Hard**) that applies to Platformer and Tower Defense.
 
@@ -10,7 +13,7 @@ SFML covers windowing, input, timing, and 2D drawing with a small surface area, 
 
 ## Build
 
-Install **SFML 3** (Graphics + Window + System CMake components), then:
+### Native desktop build
 
 ```bash
 cmake -S . -B build
@@ -19,6 +22,18 @@ cmake --build build
 ```
 
 On macOS with Homebrew you typically run `brew install sfml` and, if CMake cannot find the package, point `SFML_DIR` at the CMake config path printed by Homebrew.
+
+### WebAssembly build (Emscripten)
+
+1. Install and activate Emscripten SDK.
+2. Build SFML for Emscripten and export `SFML_DIR` to its CMake package path.
+3. Run:
+
+```bash
+./scripts/build_web.sh
+```
+
+The output is generated in `build-web/` (`miniconsole.html`, `.js`, `.wasm`, `.data`).
 
 ### Troubleshooting
 
@@ -32,12 +47,27 @@ On macOS with Homebrew you typically run `brew install sfml` and, if CMake canno
 
 ## Controls
 
-- **Menu:** arrow keys to move selection, Enter / Space to launch, `1`–`5` for quick picks, Esc quits.
-- **Menu:** arrow keys to move selection, Enter / Space to launch, `1`–`6` quick picks, Left/Right toggles difficulty, Esc quits.
+- **Menu:** arrow keys to move selection, Enter / Space to launch, `1`–`7` quick picks, Esc quits.
 - **Breakout:** A / D or arrows to move, Space to serve the ball, R resets, Esc returns to the menu.
 - **Shooter:** WASD or arrows to move, Space or Z to fire (hold to repeat), R restarts, Esc returns to the menu.
 - **Platformer:** A / D or arrows move, Space / W / Up jump, release jump for short hop, `P` pause menu, `R` restart.
-- **Tower Defense:** Cursor with arrows/WASD, `B` build, `U` upgrade, `Tab` path debug, `P` pause menu, `R` reset.
+- **Tower Defense:** Cursor with arrows/WASD, `B` build, `U` upgrade, `T` target mode, `1/2/3` tower type, `Tab` path debug, `P` pause menu, `R` reset.
+- **Minesweeper:** LMB reveal, RMB flag, MMB chord, `1/2/3` difficulty presets, `R` reset.
+- **Pac-Man:** WASD / arrows move, Enter / Space starts from attract mode, `R` restart.
+
+## Web Deployment (GitHub Pages)
+
+This repository includes `.github/workflows/deploy-web.yml` to build and publish a WebAssembly build to GitHub Pages.
+
+Workflow behavior:
+
+- Builds SFML 3.0.2 for Emscripten in CI (cached)
+- Builds this project via `emcmake`
+- Publishes `miniconsole` web artifacts to Pages on `main` pushes (or manual trigger)
+
+After enabling Pages in repository settings, your game becomes playable at:
+
+- `https://<your-user>.github.io/<repo-name>/`
 
 ## Breakout Notes
 

@@ -73,6 +73,19 @@ endif()
 
 target_link_libraries(miniconsole PRIVATE SFML::Graphics SFML::Window SFML::System)
 
+if(EMSCRIPTEN)
+    set_target_properties(miniconsole PROPERTIES SUFFIX ".html")
+    target_link_options(miniconsole PRIVATE
+        "-sALLOW_MEMORY_GROWTH=1"
+        "-sNO_EXIT_RUNTIME=1"
+        "-sASSERTIONS=1"
+        "-sUSE_WEBGL2=1"
+        "-sFULL_ES3=1"
+        "--preload-file" "${CMAKE_CURRENT_SOURCE_DIR}/levels@/levels"
+        "--shell-file" "${CMAKE_CURRENT_SOURCE_DIR}/web/shell_miniconsole.html"
+    )
+endif()
+
 if(MSVC)
     target_compile_options(miniconsole PRIVATE /W4 /permissive-)
 else()
