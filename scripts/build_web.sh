@@ -18,7 +18,10 @@ if [[ -z "${SFML_DIR:-}" ]]; then
 fi
 
 echo "Configuring web build..."
-emcmake cmake -S "${ROOT_DIR}" -B "${BUILD_DIR}" -DCMAKE_BUILD_TYPE=Release -DSFML_DIR="${SFML_DIR}"
+emcmake cmake -S "${ROOT_DIR}" -B "${BUILD_DIR}" \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DSFML_STATIC_LIBRARIES=ON \
+  -DSFML_DIR="${SFML_DIR}"
 
 echo "Building web artifacts..."
 cmake --build "${BUILD_DIR}" -j 4

@@ -50,6 +50,7 @@ jobs:
         run: |
           emcmake cmake -S . -B build-web \
             -DCMAKE_BUILD_TYPE=Release \
+            -DSFML_STATIC_LIBRARIES=ON \
             -DSFML_DIR="$GITHUB_WORKSPACE/sfml-install/lib/cmake/SFML"
 
       - name: Build MiniConsole web artifacts
