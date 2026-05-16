@@ -11,10 +11,14 @@ if ! command -v emcmake >/dev/null 2>&1; then
 fi
 
 if [[ -z "${SFML_DIR:-}" ]]; then
-  echo "error: SFML_DIR is not set."
-  echo "       Build VRSFML for Emscripten and export SFML_DIR to its cmake package path."
-  echo "       Example: export SFML_DIR=\$PWD/sfml-install/lib/cmake/SFML"
-  exit 1
+  if [[ -f "${ROOT_DIR}/sfml-install/lib/cmake/SFML/SFMLConfig.cmake" ]]; then
+    export SFML_DIR="${ROOT_DIR}/sfml-install/lib/cmake/SFML"
+    echo "SFML_DIR not set; using ${SFML_DIR}"
+  else
+    echo "error: SFML_DIR is not set and local sfml-install was not found."
+    echo "       Run ./scripts/build_vrsfml_web.sh first, then re-run this script."
+    exit 1
+  fi
 fi
 
 echo "Configuring web build..."

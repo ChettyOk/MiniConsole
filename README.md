@@ -26,8 +26,13 @@ On macOS with Homebrew you typically run `brew install sfml` and, if CMake canno
 ### WebAssembly build (Emscripten)
 
 1. Install and activate Emscripten SDK.
-2. Build **VRSFML** (web-capable SFML fork) for Emscripten and export `SFML_DIR` to its CMake package path.
-3. Run:
+2. Build **VRSFML** (web-capable SFML fork) for Emscripten:
+
+```bash
+./scripts/build_vrsfml_web.sh
+```
+
+3. Build the web app:
 
 ```bash
 ./scripts/build_web.sh

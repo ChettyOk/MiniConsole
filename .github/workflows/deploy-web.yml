@@ -24,14 +24,15 @@ jobs:
       - name: Setup Emscripten
         uses: mymindstorm/setup-emsdk@v14
         with:
-          version: "3.1.37"          # pinned — change only after testing locally
+          version: "3.1.74"          # Clang 19 — required for VRSFML C++23 support
+                                     # 3.1.37 (Clang 17) tops out at C++20 — do not use
 
       - name: Cache SFML install
         id: cache-sfml               # id required so next step can read cache-hit
         uses: actions/cache@v4
         with:
           path: sfml-install
-          key: vrsfml-web-main-v3-${{ runner.os }}
+          key: vrsfml-web-main-v6-${{ runner.os }}    # v6: force clean after Emscripten upgrade
 
       - name: Build VRSFML for Emscripten
         if: steps.cache-sfml.outputs.cache-hit != 'true'   # skip when cache restored
