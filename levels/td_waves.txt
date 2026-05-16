@@ -1,0 +1,7 @@
+# type count interval_seconds
+grunt 8 0.80
+fast 10 0.72
+tank 6 1.00
+grunt 14 0.58
+fast 16 0.52
+tank 10 0.84
