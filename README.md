@@ -1,7 +1,7 @@
 # MiniConsole
 
-[![Deploy Web Build](https://github.com/ChettyOk/MiniConsole/actions/workflows/deploy-web.yml/badge.svg?branch=main)](https://github.com/ChettyOk/MiniConsole/actions/workflows/deploy-web.yml)
-[Play in Browser (GitHub Pages)](https://chettyok.github.io/MiniConsole/)
+[![Deploy Web Build](https://github.com/ChettyOk/MiniConsole/actions/workflows/deploy-web.yml/badge.svg)](https://github.com/ChettyOk/MiniConsole/actions/workflows/deploy-web.yml)
+[Web Build Releases](https://github.com/ChettyOk/MiniConsole/releases)
 
 A small C++ “game console” host built with **SFML 3**: one window, a menu, and multiple 2D games. Playable games include **Breakout**, **Top-down shooter**, **Platformer**, **Tower defense**, **Minesweeper**, and **Pac-Man**. Persistent **top-5 highscores** are tracked across runs and viewable from a dedicated menu option.
 
@@ -62,19 +62,29 @@ The output is generated in `build-web/` (`miniconsole.html`, `.js`, `.wasm`, `.d
 - **Minesweeper:** LMB reveal, RMB flag, MMB chord, `1/2/3` difficulty presets, `R` reset.
 - **Pac-Man:** WASD / arrows move, Enter / Space starts from attract mode, `R` restart.
 
-## Web Deployment (GitHub Pages)
+## Web Deployment (GitHub Releases)
 
-This repository includes `.github/workflows/deploy-web.yml` to build and publish a WebAssembly build to GitHub Pages.
+This repository includes `.github/workflows/deploy-web.yml` to build and publish a WebAssembly package to GitHub Releases.
 
 Workflow behavior:
 
 - Builds VRSFML for Emscripten in CI (cached)
 - Builds this project via `emcmake`
-- Publishes `miniconsole` web artifacts to Pages on `main` pushes (or manual trigger)
+- Publishes `MiniConsole-Web-<tag>.zip` to GitHub Releases on `v*` tags (or manual trigger)
 
-After enabling Pages in repository settings, your game becomes playable at:
+Release package contents:
 
-- `https://<your-user>.github.io/<repo-name>/`
+- `index.html`
+- `miniconsole.js`
+- `miniconsole.wasm`
+- `miniconsole.data` (when preloaded assets are enabled)
+
+To run locally after download:
+
+```bash
+python3 -m http.server 8080
+# then open http://localhost:8080
+```
 
 ## Breakout Notes
 

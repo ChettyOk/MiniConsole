@@ -36,6 +36,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if(EMSCRIPTEN)
     set(SFML_STATIC_LIBRARIES ON)
+    list(PREPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/web")
 
     # VRSFML web package configs may reference SFML::GLUtils even when that
     # target is not exported. Predefine a compatibility placeholder so

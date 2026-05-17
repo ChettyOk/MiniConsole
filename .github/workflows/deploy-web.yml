@@ -2,17 +2,11 @@ name: Deploy Web Build
 
 on:
   push:
-    branches: ["main"]
+    tags: ["v*"]
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
+  contents: write
 
 jobs:
   build:
@@ -64,9 +58,6 @@ jobs:
         run: |
           mkdir -p site
 
-          # Suppress Jekyll processing — prevents Pages stripping _ prefixed files
-          touch site/.nojekyll
-
           cp build-web/miniconsole.html site/index.html
           cp build-web/miniconsole.js   site/
           cp build-web/miniconsole.wasm site/
@@ -76,21 +67,19 @@ jobs:
             cp build-web/miniconsole.data site/
           fi
 
-      - name: Upload GitHub Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: site
+      - name: Create web release archive
+        run: |
+          cd site
+          zip -r ../MiniConsole-Web-${GITHUB_REF_NAME}.zip .
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:                     # explicit on the job that writes to Pages
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MiniConsole-Web-${{ github.ref_name }}
+          path: MiniConsole-Web-${{ github.ref_name }}.zip
+
+      - name: Publish GitHub Release assets
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: MiniConsole-Web-${{ github.ref_name }}.zip
