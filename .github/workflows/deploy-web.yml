@@ -17,27 +17,31 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
       - name: Setup Emscripten
         uses: mymindstorm/setup-emsdk@v14
         with:
-          version: "3.1.74"          # Clang 19 — required for VRSFML C++23 support
-                                     # 3.1.37 (Clang 17) tops out at C++20 — do not use
+          version: "3.1.74"
 
       - name: Cache SFML install
-        id: cache-sfml               # id required so next step can read cache-hit
+        id: cache-sfml
         uses: actions/cache@v4
         with:
           path: sfml-install
-          key: vrsfml-web-main-v7-${{ runner.os }}    # v6: force clean after Emscripten upgrade
+          key: vrsfml-web-main-v8-${{ runner.os }}
 
       - name: Build VRSFML for Emscripten
-        if: steps.cache-sfml.outputs.cache-hit != 'true'   # skip when cache restored
+        if: steps.cache-sfml.outputs.cache-hit != 'true'
         run: |
           git clone --depth 1 --recurse-submodules https://github.com/vittorioromeo/VRSFML.git sfml-src
+
           emcmake cmake -S sfml-src -B sfml-build \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/sfml-install" \
@@ -48,7 +52,8 @@ jobs:
             -DSFML_BUILD_EXAMPLES=OFF \
             -DSFML_BUILD_TEST_SUITE=OFF \
             -DSFML_BUILD_GLUTILS=ON
-          cmake --build sfml-build --target install -j 4
+
+          cmake --build sfml-build --target install -j4
 
       - name: Configure MiniConsole web build
         run: |
@@ -58,20 +63,26 @@ jobs:
             -DSFML_DIR="$GITHUB_WORKSPACE/sfml-install/lib/cmake/SFML"
 
       - name: Build MiniConsole web artifacts
-        run: cmake --build build-web -j 4
+        run: |
+          cmake --build build-web -j4
+          ls -R build-web
 
       - name: Assemble static site
         run: |
           mkdir -p site
           touch site/.nojekyll
 
-          cp build-web/miniconsole.html site/index.html
-          cp build-web/miniconsole.js   site/
-          cp build-web/miniconsole.wasm site/
+          HTML_FILE=$(find build-web -name "*.html" | head -n 1)
+          JS_FILE=$(find build-web -name "*.js" | head -n 1)
+          WASM_FILE=$(find build-web -name "*.wasm" | head -n 1)
+          DATA_FILE=$(find build-web -name "*.data" | head -n 1)
 
-          # .data only exists when assets are preloaded via --preload-file
-          if [ -f build-web/miniconsole.data ]; then
-            cp build-web/miniconsole.data site/
+          cp "$HTML_FILE" site/index.html
+          cp "$JS_FILE" site/
+          cp "$WASM_FILE" site/
+
+          if [ -n "$DATA_FILE" ]; then
+            cp "$DATA_FILE" site/
           fi
 
       - name: Upload GitHub Pages artifact
@@ -82,12 +93,15 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+
     permissions:
       pages: write
       id-token: write
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
