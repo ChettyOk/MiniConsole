@@ -1,5 +1,6 @@
 #include "game/minesweeper/MinesweeperView.hpp"
 
+#include "core/SfmlCompat.hpp"
 #include "core/SystemFont.hpp"
 #include "game/minesweeper/MinesweeperWorld.hpp"
 
@@ -25,7 +26,7 @@ void fitTextToWidth(sf::Text& text, float maxWidth, unsigned int maxSize, unsign
 
 MinesweeperView::MinesweeperView() {
     if (tryLoadSystemFont(hudFont_)) {
-        hud_.emplace(hudFont_, "", 18u);
+        hud_ = makeText(hudFont_, "", 18u);
         hud_->setFillColor(sf::Color(220, 230, 240));
     }
 }
@@ -90,7 +91,7 @@ void MinesweeperView::draw(sf::RenderTarget& target,
             }
 
             if (c.isFlagged && !c.isRevealed) {
-                sf::Text flag(hudFont_, "F", static_cast<unsigned int>(cellSize * 0.62f));
+                sf::Text flag = makeText(hudFont_, "F", static_cast<unsigned int>(cellSize * 0.62f));
                 flag.setFillColor(sf::Color(255, 90, 90));
                 flag.setPosition({originX + x * cellSize + cellSize * 0.26f, originY + y * cellSize + cellSize * 0.08f});
                 target.draw(flag);
@@ -101,7 +102,7 @@ void MinesweeperView::draw(sf::RenderTarget& target,
                 mine.setFillColor(sf::Color(32, 32, 36));
                 target.draw(mine);
             } else if (c.isRevealed && c.adjMines > 0) {
-                sf::Text n(hudFont_, std::to_string(c.adjMines), static_cast<unsigned int>(cellSize * 0.62f));
+                sf::Text n = makeText(hudFont_, std::to_string(c.adjMines), static_cast<unsigned int>(cellSize * 0.62f));
                 n.setFillColor(numberColor(c.adjMines));
                 n.setPosition({originX + x * cellSize + cellSize * 0.28f, originY + y * cellSize + cellSize * 0.08f});
                 target.draw(n);

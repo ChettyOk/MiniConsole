@@ -2,7 +2,11 @@
 
 #include "core/Vec2.hpp"
 
+#if __has_include(<SFML/System/Vector2.hpp>)
 #include <SFML/System/Vector2.hpp>
+#else
+#include <SFML/System/Vec2.hpp>
+#endif
 
 #include <string>
 #include <vector>

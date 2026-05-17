@@ -1,5 +1,6 @@
 #include "game/towerdefense/TowerDefenseView.hpp"
 
+#include "core/SfmlCompat.hpp"
 #include "core/SystemFont.hpp"
 
 #include <SFML/Graphics/CircleShape.hpp>
@@ -22,7 +23,7 @@ void fitTextToWidth(sf::Text& text, float maxWidth, unsigned int maxSize, unsign
 
 TowerDefenseView::TowerDefenseView() {
     if (tryLoadSystemFont(hudFont_)) {
-        hud_.emplace(hudFont_, "", 15u);
+        hud_ = makeText(hudFont_, "", 15u);
         hud_->setFillColor(sf::Color(220, 230, 240));
     }
 }
@@ -161,22 +162,22 @@ void TowerDefenseView::draw(sf::RenderTarget& target,
         panel.setFillColor(sf::Color(8, 10, 14, 185));
         target.draw(panel);
 
-        sf::Text controls1(hudFont_,
-                           "Move Arrows/WASD | Build B (" + std::to_string(world.buildCost()) +
-                               "g) | Type 1:C 2:F 3:E | Upgrade U",
-                           12u);
+        sf::Text controls1 = makeText(hudFont_,
+                                      "Move Arrows/WASD | Build B (" + std::to_string(world.buildCost()) +
+                                          "g) | Type 1:C 2:F 3:E | Upgrade U",
+                                      12u);
         controls1.setFillColor(sf::Color(210, 218, 230));
         controls1.setPosition({14.f, static_cast<float>(target.getSize().y) - 76.f});
         fitTextToWidth(controls1, static_cast<float>(target.getSize().x) - 32.f, 12u);
         target.draw(controls1);
 
-        sf::Text controls2(hudFont_, "Target mode T | Pause P | Restart R | Menu Esc | Debug Tab", 12u);
+        sf::Text controls2 = makeText(hudFont_, "Target mode T | Pause P | Restart R | Menu Esc | Debug Tab", 12u);
         controls2.setFillColor(sf::Color(180, 190, 205));
         controls2.setPosition({14.f, static_cast<float>(target.getSize().y) - 56.f});
         fitTextToWidth(controls2, static_cast<float>(target.getSize().x) - 32.f, 12u);
         target.draw(controls2);
 
-        sf::Text controls3(hudFont_, "C=Cannon F=Frost E=Ember", 12u);
+        sf::Text controls3 = makeText(hudFont_, "C=Cannon F=Frost E=Ember", 12u);
         controls3.setFillColor(sf::Color(160, 170, 185));
         controls3.setPosition({14.f, static_cast<float>(target.getSize().y) - 36.f});
         fitTextToWidth(controls3, static_cast<float>(target.getSize().x) - 32.f, 12u);

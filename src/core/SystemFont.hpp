@@ -1,5 +1,7 @@
 #pragma once
 
+#include "core/SfmlCompat.hpp"
+
 #include <SFML/Graphics/Font.hpp>
 
 #include <array>
@@ -15,7 +17,7 @@ inline bool tryLoadSystemFont(sf::Font& font) {
         "C:/Windows/Fonts/arial.ttf",
     }};
     for (const char* path : candidates) {
-        if (font.openFromFile(path)) {
+        if (loadFontFromFile(font, path)) {
             return true;
         }
     }

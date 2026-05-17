@@ -1,6 +1,7 @@
 #include "states/MinesweeperState.hpp"
 
 #include "core/Application.hpp"
+#include "core/SfmlCompat.hpp"
 #include "core/SystemFont.hpp"
 #include "states/MenuState.hpp"
 
@@ -179,7 +180,7 @@ void MinesweeperState::render(sf::RenderTarget& target) {
     target.draw(veil);
 
     const char* label = world_.status() == MinesweeperWorld::Status::Win ? "VICTORY!" : "GAME OVER";
-    sf::Text text(overlayFont_, label, 60u);
+    sf::Text text = makeText(overlayFont_, label, 60u);
     text.setFillColor(world_.status() == MinesweeperWorld::Status::Win ? sf::Color(120, 255, 160)
                                                                         : sf::Color(255, 130, 130));
     const sf::FloatRect b = text.getLocalBounds();

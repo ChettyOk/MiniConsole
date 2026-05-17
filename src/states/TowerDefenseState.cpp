@@ -1,6 +1,7 @@
 #include "states/TowerDefenseState.hpp"
 
 #include "core/Application.hpp"
+#include "core/SfmlCompat.hpp"
 #include "core/SystemFont.hpp"
 #include "states/MenuState.hpp"
 
@@ -168,14 +169,14 @@ void TowerDefenseState::render(sf::RenderTarget& target) {
         veil.setFillColor(sf::Color(0, 0, 0, 150));
         target.draw(veil);
 
-        sf::Text title(overlayFont_, "PAUSED", 54u);
+        sf::Text title = makeText(overlayFont_, "PAUSED", 54u);
         title.setFillColor(sf::Color(235, 235, 245));
         title.setPosition({static_cast<float>(target.getSize().x) * 0.5f - 110.f, 180.f});
         target.draw(title);
 
         const char* opts[3] = {"Resume", "Restart", "Back to Menu"};
         for (int i = 0; i < 3; ++i) {
-            sf::Text t(overlayFont_, std::string(i == pauseSelection_ ? "> " : "  ") + opts[i], 30u);
+            sf::Text t = makeText(overlayFont_, std::string(i == pauseSelection_ ? "> " : "  ") + opts[i], 30u);
             t.setFillColor(i == pauseSelection_ ? sf::Color(120, 210, 255) : sf::Color(190, 195, 210));
             t.setPosition({static_cast<float>(target.getSize().x) * 0.5f - 130.f, 280.f + i * 46.f});
             target.draw(t);
@@ -195,7 +196,7 @@ void TowerDefenseState::render(sf::RenderTarget& target) {
     target.draw(veil);
 
     const char* label = world_.victory() ? "VICTORY!" : "GAME OVER";
-    sf::Text text(overlayFont_, label, 64u);
+    sf::Text text = makeText(overlayFont_, label, 64u);
     text.setFillColor(world_.victory() ? sf::Color(120, 255, 150) : sf::Color(255, 120, 120));
     const sf::FloatRect b = text.getLocalBounds();
     text.setOrigin({b.position.x + b.size.x * 0.5f, b.position.y + b.size.y * 0.5f});

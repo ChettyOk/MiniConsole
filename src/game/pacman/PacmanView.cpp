@@ -1,5 +1,6 @@
 #include "game/pacman/PacmanView.hpp"
 
+#include "core/SfmlCompat.hpp"
 #include "core/SystemFont.hpp"
 #include "game/pacman/PacmanWorld.hpp"
 
@@ -21,7 +22,7 @@ void fitTextToWidth(sf::Text& text, float maxWidth, unsigned int maxSize, unsign
 
 PacmanView::PacmanView() {
     if (tryLoadSystemFont(hudFont_)) {
-        hud_.emplace(hudFont_, "", 16u);
+        hud_ = makeText(hudFont_, "", 16u);
         hud_->setFillColor(sf::Color(220, 230, 240));
     }
 }

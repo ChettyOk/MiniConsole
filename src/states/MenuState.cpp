@@ -1,6 +1,7 @@
 #include "states/MenuState.hpp"
 
 #include "core/Application.hpp"
+#include "core/SfmlCompat.hpp"
 #include "core/SystemFont.hpp"
 #include "states/BreakoutState.hpp"
 #include "states/HighScoresState.hpp"
@@ -39,7 +40,7 @@ void fitTextToWidth(sf::Text& text, float maxWidth, unsigned int maxSize, unsign
 }
 
 std::string wrapTextToWidth(const sf::Font& font, const std::string& input, unsigned int size, float maxWidth) {
-    sf::Text probe(font, "", size);
+    sf::Text probe = makeText(font, "", size);
     std::istringstream words(input);
     std::string word;
     std::string line;
@@ -285,12 +286,12 @@ void MenuState::render(sf::RenderTarget& target) {
         return;
     }
 
-    sf::Text heading(font_, "MiniConsole", 42u);
+    sf::Text heading = makeText(font_, "MiniConsole", 42u);
     heading.setFillColor(sf::Color(245, 245, 250));
     heading.setPosition({48.f, 36.f});
     target.draw(heading);
 
-    sf::Text sub(font_, "SFML 3 host + fixed timestep + logic/render split", 18u);
+    sf::Text sub = makeText(font_, "SFML 3 host + fixed timestep + logic/render split", 18u);
     sub.setFillColor(sf::Color(170, 180, 200));
     sub.setPosition({52.f, 96.f});
     target.draw(sub);
@@ -308,7 +309,7 @@ void MenuState::render(sf::RenderTarget& target) {
         row.setOutlineThickness(selected ? 1.f : 0.f);
         target.draw(row);
 
-        sf::Text line(font_, std::string(i == selection_ ? "> " : "  ") + title, selected ? 24u : 22u);
+        sf::Text line = makeText(font_, std::string(i == selection_ ? "> " : "  ") + title, selected ? 24u : 22u);
         line.setFillColor(selected ? sf::Color(120, 200, 255) : sf::Color(200, 205, 220));
         line.setPosition({66.f, y});
         target.draw(line);
@@ -325,15 +326,15 @@ void MenuState::render(sf::RenderTarget& target) {
 
     const std::string wrappedBlurb =
         wrapTextToWidth(font_, kEntries[static_cast<std::size_t>(selection_)].blurb, 16u, infoCardWidth - 24.f);
-    sf::Text blurb(font_, wrappedBlurb, 16u);
+    sf::Text blurb = makeText(font_, wrappedBlurb, 16u);
     blurb.setFillColor(sf::Color(165, 175, 198));
     blurb.setPosition({72.f, y + 30.f});
     blurb.setLineSpacing(1.15f);
     target.draw(blurb);
 
-    sf::Text help(font_,
-                  "Up/Down navigate | Enter launch | 1-7 quick start | Esc quit",
-                  15u);
+    sf::Text help = makeText(font_,
+                             "Up/Down navigate | Enter launch | 1-7 quick start | Esc quit",
+                             15u);
     help.setFillColor(sf::Color(130, 140, 160));
     help.setPosition({56.f, h - 58.f});
     fitTextToWidth(help, w - 112.f, 15u);
@@ -358,7 +359,7 @@ void MenuState::render(sf::RenderTarget& target) {
         dialog.setOutlineThickness(1.f);
         target.draw(dialog);
 
-        sf::Text title(font_, "Minesweeper Difficulty", 34u);
+        sf::Text title = makeText(font_, "Minesweeper Difficulty", 34u);
         title.setFillColor(sf::Color(240, 242, 248));
         title.setPosition({198.f, 220.f});
         fitTextToWidth(title, 564.f, 34u, 22u);
@@ -366,14 +367,14 @@ void MenuState::render(sf::RenderTarget& target) {
 
         const char* labels[3] = {"Beginner 9x9 / 10", "Intermediate 16x16 / 40", "Expert 30x16 / 99"};
         for (int i = 0; i < 3; ++i) {
-            sf::Text line(font_, std::string(i == pendingMinesweeperPreset_ ? "> " : "  ") + labels[i], 25u);
+            sf::Text line = makeText(font_, std::string(i == pendingMinesweeperPreset_ ? "> " : "  ") + labels[i], 25u);
             line.setFillColor(i == pendingMinesweeperPreset_ ? sf::Color(120, 210, 255) : sf::Color(180, 188, 204));
             line.setPosition({222.f, 302.f + i * 46.f});
             fitTextToWidth(line, 544.f, 25u, 16u);
             target.draw(line);
         }
 
-        sf::Text prompt(font_, "Left/Right change | Enter start | Esc cancel", 17u);
+        sf::Text prompt = makeText(font_, "Left/Right change | Enter start | Esc cancel", 17u);
         prompt.setFillColor(sf::Color(170, 178, 193));
         prompt.setPosition({222.f, 474.f});
         fitTextToWidth(prompt, 544.f, 17u, 12u);
@@ -394,27 +395,27 @@ void MenuState::render(sf::RenderTarget& target) {
     target.draw(dialog);
 
     const char* gameName = pendingGameSelection_ == 3 ? "Tower Defense" : "Platformer";
-    sf::Text title(font_, std::string("Select Difficulty - ") + gameName, 34u);
+    sf::Text title = makeText(font_, std::string("Select Difficulty - ") + gameName, 34u);
     title.setFillColor(sf::Color(240, 242, 248));
     title.setPosition({198.f, 206.f});
     fitTextToWidth(title, 564.f, 34u, 22u);
     target.draw(title);
 
-    sf::Text normal(font_, std::string(pendingDifficulty_ == GameDifficulty::Normal ? "> " : "  ") + "Normal", 28u);
+    sf::Text normal = makeText(font_, std::string(pendingDifficulty_ == GameDifficulty::Normal ? "> " : "  ") + "Normal", 28u);
     normal.setFillColor(pendingDifficulty_ == GameDifficulty::Normal ? sf::Color(120, 210, 255)
                                                                       : sf::Color(180, 188, 204));
     normal.setPosition({256.f, 292.f});
     fitTextToWidth(normal, 530.f, 28u, 18u);
     target.draw(normal);
 
-    sf::Text hard(font_, std::string(pendingDifficulty_ == GameDifficulty::Hard ? "> " : "  ") + "Hard", 28u);
+    sf::Text hard = makeText(font_, std::string(pendingDifficulty_ == GameDifficulty::Hard ? "> " : "  ") + "Hard", 28u);
     hard.setFillColor(pendingDifficulty_ == GameDifficulty::Hard ? sf::Color(255, 150, 130)
                                                                   : sf::Color(180, 188, 204));
     hard.setPosition({256.f, 338.f});
     fitTextToWidth(hard, 530.f, 28u, 18u);
     target.draw(hard);
 
-    sf::Text prompt(font_, "Left/Right change | Enter start | Esc cancel", 17u);
+    sf::Text prompt = makeText(font_, "Left/Right change | Enter start | Esc cancel", 17u);
     prompt.setFillColor(sf::Color(170, 178, 193));
     prompt.setPosition({256.f, 398.f});
     fitTextToWidth(prompt, 530.f, 17u, 12u);
@@ -428,13 +429,13 @@ void MenuState::render(sf::RenderTarget& target) {
                                      ? "Hard: tougher enemies, faster pace, tighter resources."
                                      : "Hard: denser hazards, attack orbs, tighter jump windows.";
 
-    sf::Text normalInfo(font_, normalDesc, 16u);
+    sf::Text normalInfo = makeText(font_, normalDesc, 16u);
     normalInfo.setFillColor(sf::Color(145, 198, 235));
     normalInfo.setPosition({256.f, 442.f});
     fitTextToWidth(normalInfo, 530.f, 16u, 11u);
     target.draw(normalInfo);
 
-    sf::Text hardInfo(font_, hardDesc, 16u);
+    sf::Text hardInfo = makeText(font_, hardDesc, 16u);
     hardInfo.setFillColor(sf::Color(236, 148, 136));
     hardInfo.setPosition({256.f, 466.f});
     fitTextToWidth(hardInfo, 530.f, 16u, 11u);

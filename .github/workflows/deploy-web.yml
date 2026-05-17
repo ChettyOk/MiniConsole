@@ -35,12 +35,14 @@ jobs:
         uses: actions/cache@v4
         with:
           path: sfml-install
-          key: vrsfml-3.0.2-web-v10-${{ runner.os }}
+          key: vrsfml-main-web-v11-${{ runner.os }}
 
       - name: Build VRSFML for Emscripten
         if: steps.cache-sfml.outputs.cache-hit != 'true'
         run: |
-          git clone --depth 1 --branch 3.0.2 --recurse-submodules https://github.com/vittorioromeo/VRSFML.git sfml-src
+          git clone --depth 1 --recurse-submodules https://github.com/vittorioromeo/VRSFML.git sfml-src
+          git -C sfml-src fetch --depth 1 origin b87231e8fc0bc3480c004232b3bec4dc083218ab
+          git -C sfml-src checkout b87231e8fc0bc3480c004232b3bec4dc083218ab
 
           emcmake cmake -S sfml-src -B sfml-build \
             -DCMAKE_BUILD_TYPE=Release \

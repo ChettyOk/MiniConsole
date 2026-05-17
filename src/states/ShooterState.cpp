@@ -1,6 +1,7 @@
 #include "states/ShooterState.hpp"
 
 #include "core/Application.hpp"
+#include "core/SfmlCompat.hpp"
 #include "core/SystemFont.hpp"
 #include "states/MenuState.hpp"
 
@@ -132,7 +133,7 @@ void ShooterState::render(sf::RenderTarget& target) {
     veil.setFillColor(sf::Color(0, 0, 0, 120));
     target.draw(veil);
 
-    sf::Text text(overlayFont_, "GAME OVER", 64u);
+    sf::Text text = makeText(overlayFont_, "GAME OVER", 64u);
     text.setFillColor(sf::Color(255, 120, 120));
     const sf::FloatRect b = text.getLocalBounds();
     text.setOrigin({b.position.x + b.size.x * 0.5f, b.position.y + b.size.y * 0.5f});

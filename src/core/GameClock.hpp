@@ -23,7 +23,7 @@ public:
             ++steps;
             // Spiral of death guard: drop excess time instead of freezing.
             if (steps >= maxStepsPerFrame_) {
-                accumulator_ = sf::Time::Zero;
+                accumulator_ = sf::Time{};
                 break;
             }
         }
@@ -32,7 +32,7 @@ public:
 
 private:
     sf::Time fixedDt_;
-    sf::Time accumulator_{sf::Time::Zero};
+    sf::Time accumulator_{sf::Time{}};
     static constexpr int maxStepsPerFrame_ = 6;
 };
 

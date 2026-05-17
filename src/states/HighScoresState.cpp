@@ -1,6 +1,7 @@
 #include "states/HighScoresState.hpp"
 
 #include "core/Application.hpp"
+#include "core/SfmlCompat.hpp"
 #include "core/SystemFont.hpp"
 #include "states/MenuState.hpp"
 
@@ -55,7 +56,7 @@ void HighScoresState::render(sf::RenderTarget& target) {
         return;
     }
 
-    sf::Text title(font_, "Top 5 High Scores", 40u);
+    sf::Text title = makeText(font_, "Top 5 High Scores", 40u);
     title.setFillColor(sf::Color(240, 245, 250));
     title.setPosition({52.f, 32.f});
     fitTextToWidth(title, w - 100.f, 40u, 24u);
@@ -63,7 +64,7 @@ void HighScoresState::render(sf::RenderTarget& target) {
 
     float y = 120.f;
     if (app_->highScores().entries().empty()) {
-        sf::Text empty(font_, "No high scores yet. Finish a run to create one.", 22u);
+        sf::Text empty = makeText(font_, "No high scores yet. Finish a run to create one.", 22u);
         empty.setFillColor(sf::Color(170, 180, 195));
         empty.setPosition({60.f, y});
         target.draw(empty);
@@ -72,7 +73,7 @@ void HighScoresState::render(sf::RenderTarget& target) {
         for (const auto& e : app_->highScores().entries()) {
             std::ostringstream os;
             os << idx << ". " << e.score << "  -  " << e.game << "  (" << e.stamp << ")";
-            sf::Text line(font_, os.str(), 24u);
+            sf::Text line = makeText(font_, os.str(), 24u);
             line.setFillColor(idx == 1 ? sf::Color(255, 220, 120) : sf::Color(210, 215, 225));
             line.setPosition({60.f, y});
             fitTextToWidth(line, w - 120.f, 24u, 14u);
@@ -82,7 +83,7 @@ void HighScoresState::render(sf::RenderTarget& target) {
         }
     }
 
-    sf::Text hint(font_, "Press Enter, Space, or Esc to return to menu.", 18u);
+    sf::Text hint = makeText(font_, "Press Enter, Space, or Esc to return to menu.", 18u);
     hint.setFillColor(sf::Color(140, 150, 168));
     hint.setPosition({52.f, h - 62.f});
     fitTextToWidth(hint, w - 100.f, 18u, 12u);

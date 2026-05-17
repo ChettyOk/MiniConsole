@@ -3,14 +3,15 @@
 #include "states/MenuState.hpp"
 
 #include <SFML/System/Clock.hpp>
-#include <SFML/System/Sleep.hpp>
 #include <SFML/Window/Event.hpp>
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/emscripten.h>
 #endif
 
+#include <chrono>
 #include <optional>
+#include <thread>
 
 namespace mc {
 
@@ -83,7 +84,7 @@ bool Application::runFrame() {
 #ifndef __EMSCRIPTEN__
     const sf::Time frameTime = frameClock_.getElapsedTime();
     if (frameTime < sf::milliseconds(1)) {
-        sf::sleep(sf::milliseconds(1) - frameTime);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 #endif
     return running_ && window_.isOpen();

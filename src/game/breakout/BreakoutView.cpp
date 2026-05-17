@@ -1,5 +1,6 @@
 #include "game/breakout/BreakoutView.hpp"
 #include "game/breakout/BreakoutWorld.hpp"
+#include "core/SfmlCompat.hpp"
 #include "core/SystemFont.hpp"
 
 #include <SFML/Graphics/CircleShape.hpp>
@@ -35,7 +36,7 @@ void fitTextToWidth(sf::Text& text, float maxWidth, unsigned int maxSize, unsign
 
 BreakoutView::BreakoutView() {
     if (tryLoadSystemFont(hudFont_)) {
-        hud_.emplace(hudFont_, "", 18u);
+        hud_ = makeText(hudFont_, "", 18u);
         hud_->setFillColor(sf::Color(220, 220, 230));
     }
 }

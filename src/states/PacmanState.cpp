@@ -1,6 +1,7 @@
 #include "states/PacmanState.hpp"
 
 #include "core/Application.hpp"
+#include "core/SfmlCompat.hpp"
 #include "core/SystemFont.hpp"
 #include "states/MenuState.hpp"
 
@@ -134,7 +135,7 @@ void PacmanState::render(sf::RenderTarget& target) {
         veil.setFillColor(sf::Color(0, 0, 0, 110));
         target.draw(veil);
 
-        sf::Text title(overlayFont_, "PAC-MAN", 68u);
+        sf::Text title = makeText(overlayFont_, "PAC-MAN", 68u);
         title.setFillColor(sf::Color(255, 230, 80));
         fitTextToWidth(title, static_cast<float>(target.getSize().x) - 40.f, 68u, 36u);
         const sf::FloatRect tb = title.getLocalBounds();
@@ -142,7 +143,7 @@ void PacmanState::render(sf::RenderTarget& target) {
         title.setPosition({static_cast<float>(target.getSize().x) * 0.5f, 150.f});
         target.draw(title);
 
-        sf::Text subtitle(overlayFont_, "Ghost AI demo running", 28u);
+        sf::Text subtitle = makeText(overlayFont_, "Ghost AI demo running", 28u);
         subtitle.setFillColor(sf::Color(170, 185, 210));
         fitTextToWidth(subtitle, static_cast<float>(target.getSize().x) - 60.f, 28u, 16u);
         const sf::FloatRect sb = subtitle.getLocalBounds();
@@ -151,7 +152,7 @@ void PacmanState::render(sf::RenderTarget& target) {
         target.draw(subtitle);
 
         if (static_cast<int>(attractBlinkTime_ * 2.f) % 2 == 0) {
-            sf::Text prompt(overlayFont_, "Press Enter/Space to Start", 30u);
+            sf::Text prompt = makeText(overlayFont_, "Press Enter/Space to Start", 30u);
             prompt.setFillColor(sf::Color(120, 220, 255));
             fitTextToWidth(prompt, static_cast<float>(target.getSize().x) - 80.f, 30u, 16u);
             const sf::FloatRect pb = prompt.getLocalBounds();
@@ -172,7 +173,7 @@ void PacmanState::render(sf::RenderTarget& target) {
     target.draw(veil);
 
     const char* label = world_.victory() ? "VICTORY!" : "GAME OVER";
-    sf::Text text(overlayFont_, label, 64u);
+    sf::Text text = makeText(overlayFont_, label, 64u);
     text.setFillColor(world_.victory() ? sf::Color(120, 255, 160) : sf::Color(255, 130, 130));
     const sf::FloatRect b = text.getLocalBounds();
     text.setOrigin({b.position.x + b.size.x * 0.5f, b.position.y + b.size.y * 0.5f});

@@ -1,6 +1,7 @@
 #include "states/BreakoutState.hpp"
 
 #include "core/Application.hpp"
+#include "core/SfmlCompat.hpp"
 #include "core/SystemFont.hpp"
 #include "states/MenuState.hpp"
 
@@ -114,7 +115,7 @@ void BreakoutState::render(sf::RenderTarget& target) {
     target.draw(veil);
 
     const char* label = world_.cleared() ? "VICTORY!" : "GAME OVER";
-    sf::Text text(overlayFont_, label, 64u);
+    sf::Text text = makeText(overlayFont_, label, 64u);
     text.setFillColor(world_.cleared() ? sf::Color(110, 255, 150) : sf::Color(255, 120, 120));
     const sf::FloatRect b = text.getLocalBounds();
     text.setOrigin({b.position.x + b.size.x * 0.5f, b.position.y + b.size.y * 0.5f});

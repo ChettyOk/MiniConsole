@@ -1,5 +1,6 @@
 #include "game/platformer/PlatformerView.hpp"
 
+#include "core/SfmlCompat.hpp"
 #include "core/SystemFont.hpp"
 #include "game/platformer/PlatformerWorld.hpp"
 
@@ -21,7 +22,7 @@ void fitTextToWidth(sf::Text& text, float maxWidth, unsigned int maxSize, unsign
 
 PlatformerView::PlatformerView() {
     if (tryLoadSystemFont(hudFont_)) {
-        hud_.emplace(hudFont_, "", 18u);
+        hud_ = makeText(hudFont_, "", 18u);
         hud_->setFillColor(sf::Color(225, 235, 245));
     }
 }
