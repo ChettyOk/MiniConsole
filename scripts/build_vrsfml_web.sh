@@ -14,7 +14,7 @@ fi
 
 if [[ ! -d "${SRC_DIR}" ]]; then
   echo "Cloning VRSFML..."
-  git clone --depth 1 --recurse-submodules https://github.com/vittorioromeo/VRSFML.git "${SRC_DIR}"
+  git clone --depth 1 --branch 3.0.2 --recurse-submodules https://github.com/vittorioromeo/VRSFML.git "${SRC_DIR}"
 else
   echo "Using existing ${SRC_DIR}"
 fi
@@ -30,8 +30,7 @@ emcmake cmake -S "${SRC_DIR}" -B "${BUILD_DIR}" \
   -DSFML_BUILD_NETWORK=OFF \
   -DSFML_BUILD_EXAMPLES=OFF \
   -DSFML_BUILD_TEST_SUITE=OFF \
-  -DSFML_BUILD_GLUTILS=OFF \
-  -DSFML_ENABLE_EMSCRIPTEN=ON
+  -DSFML_BUILD_GLUTILS=OFF
 
 echo "Building and installing VRSFML..."
 cmake --build "${BUILD_DIR}" --target install -j 4

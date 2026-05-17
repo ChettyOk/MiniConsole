@@ -40,8 +40,8 @@ On macOS with Homebrew you typically run `brew install sfml` and, if CMake canno
 
 The output is generated in `build-web/` (`miniconsole.html`, `.js`, `.wasm`, `.data`).
 
-> Note: Upstream SFML 3.0.2 does not currently configure on Emscripten. The web pipeline uses VRSFML (with submodules and bundled deps) in CI.
-> The CI build disables GLUTILS and enables Emscripten mode explicitly to avoid native EGL dependency resolution.
+> Note: Upstream SFML 3.0.2 does not currently configure on Emscripten. The web pipeline uses VRSFML tag `3.0.2` (with submodules and bundled deps) in CI.
+> The CI build disables GLUTILS to avoid native EGL dependency resolution.
 
 ### Troubleshooting
 
