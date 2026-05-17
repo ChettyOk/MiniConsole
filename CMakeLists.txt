@@ -37,6 +37,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if(EMSCRIPTEN)
     set(SFML_STATIC_LIBRARIES ON)
     list(PREPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/web")
+    set(SFML_OS_EMSCRIPTEN ON)
+    set(EGL_LIBRARY EGL CACHE STRING "EGL library for Emscripten shim")
+    if(CMAKE_SYSROOT)
+        set(EGL_INCLUDE_DIR "${CMAKE_SYSROOT}/include" CACHE PATH "EGL include dir for Emscripten shim")
+    endif()
 
     # VRSFML web package configs may reference SFML::GLUtils even when that
     # target is not exported. Predefine a compatibility placeholder so
