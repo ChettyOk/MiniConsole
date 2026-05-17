@@ -43,6 +43,12 @@ if(EMSCRIPTEN)
     if(NOT TARGET SFML::GLUtils)
         add_library(SFML::GLUtils INTERFACE IMPORTED GLOBAL)
     endif()
+
+    # Some VRSFML package exports for Emscripten also reference a plain
+    # `freetype` imported target. Predefine it as a compatibility placeholder.
+    if(NOT TARGET freetype)
+        add_library(freetype INTERFACE IMPORTED GLOBAL)
+    endif()
 endif()
 
 find_package(SFML 3 COMPONENTS Graphics Window System REQUIRED)
