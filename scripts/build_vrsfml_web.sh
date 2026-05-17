@@ -29,7 +29,9 @@ emcmake cmake -S "${SRC_DIR}" -B "${BUILD_DIR}" \
   -DSFML_BUILD_AUDIO=OFF \
   -DSFML_BUILD_NETWORK=OFF \
   -DSFML_BUILD_EXAMPLES=OFF \
-  -DSFML_BUILD_TEST_SUITE=OFF
+  -DSFML_BUILD_TEST_SUITE=OFF \
+  -DSFML_BUILD_GLUTILS=OFF \
+  -DSFML_ENABLE_EMSCRIPTEN=ON
 
 echo "Building and installing VRSFML..."
 cmake --build "${BUILD_DIR}" --target install -j 4

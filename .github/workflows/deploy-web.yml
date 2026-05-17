@@ -35,7 +35,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: sfml-install
-          key: vrsfml-web-main-v8-${{ runner.os }}
+          key: vrsfml-web-main-v9-${{ runner.os }}
 
       - name: Build VRSFML for Emscripten
         if: steps.cache-sfml.outputs.cache-hit != 'true'
@@ -51,7 +51,8 @@ jobs:
             -DSFML_BUILD_NETWORK=OFF \
             -DSFML_BUILD_EXAMPLES=OFF \
             -DSFML_BUILD_TEST_SUITE=OFF \
-            -DSFML_BUILD_GLUTILS=ON
+            -DSFML_BUILD_GLUTILS=OFF \
+            -DSFML_ENABLE_EMSCRIPTEN=ON
 
           cmake --build sfml-build --target install -j4
 
