@@ -127,6 +127,57 @@ else:
     raise SystemExit("Could not find SFML_OS_LINUX joystick branch in Window CMakeLists.txt")
 PY
 
+echo "Patching VRSFML Linux joystick header for Emscripten stubs..."
+python3 - "${SRC_DIR}" <<'PY'
+import sys
+from pathlib import Path
+
+hdr = Path(sys.argv[1]) / "src" / "SFML" / "Window" / "Unix" / "JoystickImpl.hpp"
+text = hdr.read_text()
+
+include_needle = "#include <linux/input.h>"
+include_replacement = """#if defined(__EMSCRIPTEN__)
+#ifndef ABS_CNT
+#define ABS_CNT 64
+#endif
+#else
+#include <linux/input.h>
+#endif"""
+
+if include_replacement in text:
+    print("Linux joystick include guard patch already present.")
+elif include_needle in text:
+    text = text.replace(include_needle, include_replacement, 1)
+    print("Patched linux/input include guard for Emscripten.")
+else:
+    raise SystemExit("Could not find linux/input include in Unix/JoystickImpl.hpp")
+
+stub_marker = "JoystickImpl::initialize()"
+if stub_marker not in text:
+    inject_anchor = "} // namespace sf::priv"
+    if inject_anchor not in text:
+        raise SystemExit("Could not find namespace end in Unix/JoystickImpl.hpp")
+    stub_block = """
+#if defined(__EMSCRIPTEN__)
+inline void JoystickImpl::initialize() {}
+inline void JoystickImpl::cleanup() {}
+inline bool JoystickImpl::isConnected(unsigned int) { return false; }
+inline bool JoystickImpl::open(unsigned int) { return false; }
+inline void JoystickImpl::close() {}
+inline JoystickCaps JoystickImpl::getCapabilities() const { return {}; }
+inline Joystick::Identification JoystickImpl::getIdentification() const { return {}; }
+inline JoystickState JoystickImpl::update() { return {}; }
+#endif
+
+"""
+    text = text.replace(inject_anchor, stub_block + inject_anchor, 1)
+    print("Injected Emscripten joystick inline stubs.")
+else:
+    print("Emscripten joystick inline stubs already present.")
+
+hdr.write_text(text)
+PY
+
 echo "Configuring VRSFML for Emscripten..."
 rm -rf "${BUILD_DIR}"
 emcmake cmake -S "${SRC_DIR}" -B "${BUILD_DIR}" \
