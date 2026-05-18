@@ -50,7 +50,45 @@ else:
     print("EMSCRIPTEN platform block already present.")
 PY
 
+echo "Patching VRSFML CMake for OpenGL target shims..."
+python3 - "${SRC_DIR}" <<'PY'
+import sys
+from pathlib import Path
+
+root_cmake = Path(sys.argv[1]) / "CMakeLists.txt"
+text = root_cmake.read_text()
+
+if "MiniConsole OpenGL shim patch" not in text:
+    marker = "project("
+    pos = text.find(marker)
+    if pos == -1:
+        raise SystemExit("Could not find project() in VRSFML CMakeLists.txt")
+
+    line_end = text.find("\n", pos)
+    if line_end == -1:
+        line_end = len(text)
+
+    shim = """
+
+# MiniConsole OpenGL shim patch (Emscripten)
+if(EMSCRIPTEN)
+    if(NOT TARGET OpenGL::GL)
+        add_library(OpenGL::GL INTERFACE IMPORTED)
+    endif()
+    if(NOT TARGET OpenGL::OpenGL)
+        add_library(OpenGL::OpenGL INTERFACE IMPORTED)
+    endif()
+endif()
+"""
+    text = text[:line_end + 1] + shim + text[line_end + 1:]
+    root_cmake.write_text(text)
+    print("Injected OpenGL imported target shim block.")
+else:
+    print("OpenGL shim block already present.")
+PY
+
 echo "Configuring VRSFML for Emscripten..."
+rm -rf "${BUILD_DIR}"
 emcmake cmake -S "${SRC_DIR}" -B "${BUILD_DIR}" \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
