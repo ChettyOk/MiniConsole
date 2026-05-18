@@ -87,6 +87,26 @@ else:
     print("OpenGL shim block already present.")
 PY
 
+echo "Patching VRSFML Config.hpp for Emscripten OS detection..."
+python3 - "${SRC_DIR}" <<'PY'
+import sys
+from pathlib import Path
+
+cfg = Path(sys.argv[1]) / "include" / "SFML" / "Config.hpp"
+text = cfg.read_text()
+
+needle = "#elif defined(__linux__)"
+replacement = "#elif defined(__linux__) || defined(__EMSCRIPTEN__)"
+
+if replacement in text:
+    print("Config.hpp Emscripten OS patch already present.")
+elif needle in text:
+    cfg.write_text(text.replace(needle, replacement, 1))
+    print("Patched Config.hpp to recognize __EMSCRIPTEN__ as UNIX target.")
+else:
+    raise SystemExit("Could not find linux platform branch in Config.hpp")
+PY
+
 echo "Configuring VRSFML for Emscripten..."
 rm -rf "${BUILD_DIR}"
 emcmake cmake -S "${SRC_DIR}" -B "${BUILD_DIR}" \
