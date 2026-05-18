@@ -40,52 +40,19 @@ jobs:
       - name: Build VRSFML for Emscripten
         if: steps.cache-sfml.outputs.cache-hit != 'true'
         run: |
-          git clone --depth 1 --recurse-submodules https://github.com/vittorioromeo/VRSFML.git sfml-src
-          git -C sfml-src fetch --depth 1 origin b87231e8fc0bc3480c004232b3bec4dc083218ab
-          git -C sfml-src checkout b87231e8fc0bc3480c004232b3bec4dc083218ab
-
-          emcmake cmake -S sfml-src -B sfml-build \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/sfml-install" \
-            -DBUILD_SHARED_LIBS=OFF \
-            -DSFML_USE_SYSTEM_DEPS=OFF \
-            -DSFML_BUILD_AUDIO=OFF \
-            -DSFML_BUILD_NETWORK=OFF \
-            -DSFML_BUILD_EXAMPLES=OFF \
-            -DSFML_BUILD_TEST_SUITE=OFF \
-            -DSFML_BUILD_GLUTILS=OFF
-
-          cmake --build sfml-build --target install -j4
-
-      - name: Configure MiniConsole web build
-        run: |
-          emcmake cmake -S . -B build-web \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DSFML_STATIC_LIBRARIES=ON \
-            -DSFML_DIR="$GITHUB_WORKSPACE/sfml-install/lib/cmake/SFML"
+          ./scripts/build_vrsfml_web.sh
 
       - name: Build MiniConsole web artifacts
         run: |
-          cmake --build build-web -j4
+          ./scripts/build_web.sh
+
+      - name: Show generated web build
+        run: |
           ls -R build-web
 
       - name: Assemble static site
         run: |
-          mkdir -p site
-          touch site/.nojekyll
-
-          HTML_FILE=$(find build-web -name "*.html" | head -n 1)
-          JS_FILE=$(find build-web -name "*.js" | head -n 1)
-          WASM_FILE=$(find build-web -name "*.wasm" | head -n 1)
-          DATA_FILE=$(find build-web -name "*.data" | head -n 1)
-
-          cp "$HTML_FILE" site/index.html
-          cp "$JS_FILE" site/
-          cp "$WASM_FILE" site/
-
-          if [ -n "$DATA_FILE" ]; then
-            cp "$DATA_FILE" site/
-          fi
+          ./scripts/package_web_site.sh
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3

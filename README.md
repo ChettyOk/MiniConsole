@@ -39,8 +39,15 @@ On macOS with Homebrew you typically run `brew install sfml` and, if CMake canno
 ```
 
 The output is generated in `build-web/` (`miniconsole.html`, `.js`, `.wasm`, `.data`).
+4. Package a static site folder:
 
-> Note: Upstream SFML 3.0.2 does not currently configure on Emscripten. The web pipeline uses VRSFML tag `3.0.2` (with submodules and bundled deps) in CI.
+```bash
+./scripts/package_web_site.sh
+```
+
+This creates `site/` with `index.html` and runtime assets, ready for GitHub Pages upload.
+
+> Note: Upstream SFML 3.0.2 does not currently configure on Emscripten. The web pipeline pins VRSFML commit `b87231e8fc0bc3480c004232b3bec4dc083218ab` (with submodules and bundled deps) in CI.
 > The CI build disables GLUTILS to avoid native EGL dependency resolution.
 
 ### Troubleshooting
@@ -70,7 +77,8 @@ This repository includes `.github/workflows/deploy-web.yml` to build and publish
 Workflow behavior:
 
 - Builds VRSFML for Emscripten in CI (cached)
-- Builds this project via `emcmake`
+- Builds this project via `./scripts/build_web.sh`
+- Packages deployable static assets via `./scripts/package_web_site.sh`
 - Publishes static web artifacts to GitHub Pages on `main` pushes (or manual trigger)
 
 Published site contents:

@@ -5,6 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SRC_DIR="${ROOT_DIR}/sfml-src"
 BUILD_DIR="${ROOT_DIR}/sfml-build"
 INSTALL_DIR="${ROOT_DIR}/sfml-install"
+VRSFML_COMMIT="b87231e8fc0bc3480c004232b3bec4dc083218ab"
 
 if ! command -v emcmake >/dev/null 2>&1; then
   echo "error: emcmake not found. Install/activate Emscripten SDK first."
@@ -15,15 +16,13 @@ fi
 if [[ ! -d "${SRC_DIR}" ]]; then
   echo "Cloning VRSFML..."
   git clone --depth 1 --recurse-submodules https://github.com/vittorioromeo/VRSFML.git "${SRC_DIR}"
-  git -C "${SRC_DIR}" fetch --depth 1 origin b87231e8fc0bc3480c004232b3bec4dc083218ab
-  git -C "${SRC_DIR}" checkout b87231e8fc0bc3480c004232b3bec4dc083218ab
 else
   echo "Using existing ${SRC_DIR}"
 fi
 
 echo "Pinning VRSFML revision for web build..."
-git -C "${SRC_DIR}" fetch --depth 1 origin b87231e8fc0bc3480c004232b3bec4dc083218ab
-git -C "${SRC_DIR}" checkout b87231e8fc0bc3480c004232b3bec4dc083218ab
+git -C "${SRC_DIR}" fetch --depth 1 origin "${VRSFML_COMMIT}"
+git -C "${SRC_DIR}" checkout "${VRSFML_COMMIT}"
 
 echo "Configuring VRSFML for Emscripten..."
 emcmake cmake -S "${SRC_DIR}" -B "${BUILD_DIR}" \
