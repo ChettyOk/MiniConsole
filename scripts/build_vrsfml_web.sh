@@ -107,6 +107,26 @@ else:
     raise SystemExit("Could not find linux platform branch in Config.hpp")
 PY
 
+echo "Patching VRSFML Window CMake to skip Linux joystick on Emscripten..."
+python3 - "${SRC_DIR}" <<'PY'
+import sys
+from pathlib import Path
+
+cmake_file = Path(sys.argv[1]) / "src" / "SFML" / "Window" / "CMakeLists.txt"
+text = cmake_file.read_text()
+
+needle = "if(SFML_OS_LINUX)"
+replacement = "if(SFML_OS_LINUX AND NOT SFML_OS_EMSCRIPTEN)"
+
+if replacement in text:
+    print("Window joystick Emscripten patch already present.")
+elif needle in text:
+    cmake_file.write_text(text.replace(needle, replacement, 1))
+    print("Patched Window CMakeLists to skip Linux joystick on Emscripten.")
+else:
+    raise SystemExit("Could not find SFML_OS_LINUX joystick branch in Window CMakeLists.txt")
+PY
+
 echo "Configuring VRSFML for Emscripten..."
 rm -rf "${BUILD_DIR}"
 emcmake cmake -S "${SRC_DIR}" -B "${BUILD_DIR}" \
