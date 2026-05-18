@@ -34,29 +34,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-if(EMSCRIPTEN)
-    set(SFML_STATIC_LIBRARIES ON)
-    list(PREPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/web")
-    set(SFML_OS_EMSCRIPTEN ON)
-    set(EGL_LIBRARY EGL CACHE STRING "EGL library for Emscripten shim")
-    if(CMAKE_SYSROOT)
-        set(EGL_INCLUDE_DIR "${CMAKE_SYSROOT}/include" CACHE PATH "EGL include dir for Emscripten shim")
-    endif()
-
-    # VRSFML web package configs may reference SFML::GLUtils even when that
-    # target is not exported. Predefine a compatibility placeholder so
-    # find_package(SFML ...) can import successfully.
-    if(NOT TARGET SFML::GLUtils)
-        add_library(SFML::GLUtils INTERFACE IMPORTED GLOBAL)
-    endif()
-
-    # Some VRSFML package exports for Emscripten also reference a plain
-    # `freetype` imported target. Predefine it as a compatibility placeholder.
-    if(NOT TARGET freetype)
-        add_library(freetype INTERFACE IMPORTED GLOBAL)
-    endif()
-endif()
-
 find_package(SFML 3 COMPONENTS Graphics Window System REQUIRED)
 
 add_executable(miniconsole
@@ -95,19 +72,6 @@ if(APPLE AND CMAKE_OSX_SYSROOT)
 endif()
 
 target_link_libraries(miniconsole PRIVATE SFML::Graphics SFML::Window SFML::System)
-
-if(EMSCRIPTEN)
-    set_target_properties(miniconsole PROPERTIES SUFFIX ".html")
-    target_link_options(miniconsole PRIVATE
-        "-sALLOW_MEMORY_GROWTH=1"
-        "-sNO_EXIT_RUNTIME=1"
-        "-sASSERTIONS=1"
-        "-sUSE_WEBGL2=1"
-        "-sFULL_ES3=1"
-        "--preload-file" "${CMAKE_CURRENT_SOURCE_DIR}/levels@/levels"
-        "--shell-file" "${CMAKE_CURRENT_SOURCE_DIR}/web/shell_miniconsole.html"
-    )
-endif()
 
 if(MSVC)
     target_compile_options(miniconsole PRIVATE /W4 /permissive-)

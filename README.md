@@ -1,8 +1,5 @@
 # MiniConsole
 
-[![Deploy Web Build](https://github.com/ChettyOk/MiniConsole/actions/workflows/deploy-web.yml/badge.svg)](https://github.com/ChettyOk/MiniConsole/actions/workflows/deploy-web.yml)
-[Play in Browser (GitHub Pages)](https://chettyok.github.io/MiniConsole/)
-
 A small C++ “game console” host built with **SFML 3**: one window, a menu, and multiple 2D games. Playable games include **Breakout**, **Top-down shooter**, **Platformer**, **Tower defense**, **Minesweeper**, and **Pac-Man**. Persistent **top-5 highscores** are tracked across runs and viewable from a dedicated menu option.
 
 The menu includes a **Difficulty** selector (**Normal/Hard**) that applies to Platformer and Tower Defense.
@@ -23,33 +20,6 @@ cmake --build build
 
 On macOS with Homebrew you typically run `brew install sfml` and, if CMake cannot find the package, point `SFML_DIR` at the CMake config path printed by Homebrew.
 
-### WebAssembly build (Emscripten)
-
-1. Install and activate Emscripten SDK.
-2. Build **VRSFML** (web-capable SFML fork) for Emscripten:
-
-```bash
-./scripts/build_vrsfml_web.sh
-```
-
-3. Build the web app:
-
-```bash
-./scripts/build_web.sh
-```
-
-The output is generated in `build-web/` (`miniconsole.html`, `.js`, `.wasm`, `.data`).
-4. Package a static site folder:
-
-```bash
-./scripts/package_web_site.sh
-```
-
-This creates `site/` with `index.html` and runtime assets, ready for GitHub Pages upload.
-
-> Note: Upstream SFML 3.0.2 does not currently configure on Emscripten. The web pipeline uses VRSFML tag `3.0.2` and applies an automated Emscripten CMake detection patch during build.
-> The CI build disables GLUTILS to avoid native EGL dependency resolution.
-
 ### Troubleshooting
 
 - **`find_package(SFML)` version mismatch:** This tree targets **SFML 3** (`SFML::Graphics`, `std::optional` + `sf::Event::getIf` API). Homebrew’s `sfml` formula is 3.x; use SFML 2.5 only if you intentionally downgrade the code and CMake back to 2.5.
@@ -69,24 +39,6 @@ This creates `site/` with `index.html` and runtime assets, ready for GitHub Page
 - **Tower Defense:** Cursor with arrows/WASD, `B` build, `U` upgrade, `T` target mode, `1/2/3` tower type, `Tab` path debug, `P` pause menu, `R` reset.
 - **Minesweeper:** LMB reveal, RMB flag, MMB chord, `1/2/3` difficulty presets, `R` reset.
 - **Pac-Man:** WASD / arrows move, Enter / Space starts from attract mode, `R` restart.
-
-## Web Deployment (GitHub Pages)
-
-This repository includes `.github/workflows/deploy-web.yml` to build and publish a WebAssembly package to GitHub Pages.
-
-Workflow behavior:
-
-- Builds VRSFML for Emscripten in CI (cached)
-- Builds this project via `./scripts/build_web.sh`
-- Packages deployable static assets via `./scripts/package_web_site.sh`
-- Publishes static web artifacts to GitHub Pages on `main` pushes (or manual trigger)
-
-Published site contents:
-
-- `index.html`
-- `miniconsole.js`
-- `miniconsole.wasm`
-- `miniconsole.data` (when preloaded assets are enabled)
 
 ## Breakout Notes
 
