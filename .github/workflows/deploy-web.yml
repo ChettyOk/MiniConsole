@@ -35,7 +35,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: sfml-install
-          key: vrsfml-main-web-v11-${{ runner.os }}
+          key: vrsfml-3.0.2-emscriptenpatch-v12-${{ runner.os }}
 
       - name: Build VRSFML for Emscripten
         if: steps.cache-sfml.outputs.cache-hit != 'true'

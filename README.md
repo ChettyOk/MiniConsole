@@ -47,7 +47,7 @@ The output is generated in `build-web/` (`miniconsole.html`, `.js`, `.wasm`, `.d
 
 This creates `site/` with `index.html` and runtime assets, ready for GitHub Pages upload.
 
-> Note: Upstream SFML 3.0.2 does not currently configure on Emscripten. The web pipeline pins VRSFML commit `b87231e8fc0bc3480c004232b3bec4dc083218ab` (with submodules and bundled deps) in CI.
+> Note: Upstream SFML 3.0.2 does not currently configure on Emscripten. The web pipeline uses VRSFML tag `3.0.2` and applies an automated Emscripten CMake detection patch during build.
 > The CI build disables GLUTILS to avoid native EGL dependency resolution.
 
 ### Troubleshooting

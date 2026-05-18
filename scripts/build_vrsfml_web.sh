@@ -5,7 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SRC_DIR="${ROOT_DIR}/sfml-src"
 BUILD_DIR="${ROOT_DIR}/sfml-build"
 INSTALL_DIR="${ROOT_DIR}/sfml-install"
-VRSFML_COMMIT="b87231e8fc0bc3480c004232b3bec4dc083218ab"
+VRSFML_REF="3.0.2"
 
 if ! command -v emcmake >/dev/null 2>&1; then
   echo "error: emcmake not found. Install/activate Emscripten SDK first."
@@ -15,14 +15,40 @@ fi
 
 if [[ ! -d "${SRC_DIR}" ]]; then
   echo "Cloning VRSFML..."
-  git clone --depth 1 --recurse-submodules https://github.com/vittorioromeo/VRSFML.git "${SRC_DIR}"
+  git clone --depth 1 --branch "${VRSFML_REF}" --recurse-submodules https://github.com/vittorioromeo/VRSFML.git "${SRC_DIR}"
 else
   echo "Using existing ${SRC_DIR}"
 fi
 
 echo "Pinning VRSFML revision for web build..."
-git -C "${SRC_DIR}" fetch --depth 1 origin "${VRSFML_COMMIT}"
-git -C "${SRC_DIR}" checkout "${VRSFML_COMMIT}"
+git -C "${SRC_DIR}" fetch --depth 1 origin "${VRSFML_REF}"
+git -C "${SRC_DIR}" checkout "${VRSFML_REF}"
+
+echo "Patching VRSFML CMake for Emscripten platform detection..."
+python3 - "${SRC_DIR}" <<'PY'
+import sys
+from pathlib import Path
+
+cfg = Path(sys.argv[1]) / "cmake" / "Config.cmake"
+text = cfg.read_text()
+
+if "elseif(${EMSCRIPTEN})" not in text:
+    marker = "elseif(${CYGWIN})"
+    if marker not in text:
+        raise SystemExit("Could not find CYGWIN marker in VRSFML Config.cmake")
+    injected = """elseif(${EMSCRIPTEN})
+    message(STATUS "Detected Emscripten")
+    set(SFML_OS_EMSCRIPTEN 1)
+
+    # use the OpenGL ES implementation on Emscripten
+    set(OPENGL_ES 1)
+"""
+    text = text.replace(marker, injected + "\n" + marker, 1)
+    cfg.write_text(text)
+    print("Injected EMSCRIPTEN platform block.")
+else:
+    print("EMSCRIPTEN platform block already present.")
+PY
 
 echo "Configuring VRSFML for Emscripten..."
 emcmake cmake -S "${SRC_DIR}" -B "${BUILD_DIR}" \
